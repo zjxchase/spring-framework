@@ -117,14 +117,21 @@ class ConstructorResolver {
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
 
+		// 定义bean包装类
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
 
+		// 最终用于实例化的构造函数
 		Constructor<?> constructorToUse = null;
+		// 最终用于实例化的参数Holder
 		ArgumentsHolder argsHolderToUse = null;
+		// 最终用于实例化的构造函数参数
 		Object[] argsToUse = null;
 
+		// 1.解析出要用于实例化的构造函数参数
 		if (explicitArgs != null) {
+			// 1.1 如果explicitArgs不为空，则构造函数的参数直接使用explicitArgs
+			// 通过getBean方法调用时，显示指定了参数，则explicitArgs就不为null
 			argsToUse = explicitArgs;
 		}
 		else {
