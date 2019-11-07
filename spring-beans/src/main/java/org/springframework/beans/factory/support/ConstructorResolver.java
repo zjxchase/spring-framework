@@ -1061,12 +1061,16 @@ class ConstructorResolver {
 
 		public void storeCache(RootBeanDefinition mbd, Executable constructorOrFactoryMethod) {
 			synchronized (mbd.constructorArgumentLock) {
+				// 将构造函数或工厂方法放到resolvedConstructorOrFactoryMethod缓存
 				mbd.resolvedConstructorOrFactoryMethod = constructorOrFactoryMethod;
+				// constructorArgumentsResolved标记为已解析
 				mbd.constructorArgumentsResolved = true;
 				if (this.resolveNecessary) {
+					// 如果参数需要解析，则将preparedArguments放到preparedConstructorArguments缓存
 					mbd.preparedConstructorArguments = this.preparedArguments;
 				}
 				else {
+					// 如果参数不需要解析，则将arguments放到resolvedConstructorArguments缓存
 					mbd.resolvedConstructorArguments = this.arguments;
 				}
 			}
