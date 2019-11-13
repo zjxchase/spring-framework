@@ -34,18 +34,24 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A root bean definition represents the merged bean definition that backs
- * a specific bean in a Spring BeanFactory at runtime. It might have been created
- * from multiple original bean definitions that inherit from each other,
- * typically registered as {@link GenericBeanDefinition GenericBeanDefinitions}.
- * A root bean definition is essentially the 'unified' bean definition view at runtime.
+ * A root bean definition represents（代表） the merged（合并的） bean definition that backs
+ * a specific（明确的） bean in a Spring BeanFactory at runtime. It might have been created
+ * from multiple（许多的） original bean definitions that inherit（继承） from each other,
+ * typically（代表性地） registered as {@link GenericBeanDefinition GenericBeanDefinitions}.
+ * A root bean definition is essentially（本质上） the 'unified'（一致标准的） bean definition view at runtime.
  *
- * <p>Root bean definitions may also be used for registering individual bean definitions
- * in the configuration phase. However, since Spring 2.5, the preferred way to register
- * bean definitions programmatically is the {@link GenericBeanDefinition} class.
- * GenericBeanDefinition has the advantage that it allows to dynamically define
+ * 根bean定义表示在运行时在Spring BeanFactory中支持特定bean的合并bean定义。
+ * 它可能是由从彼此继承的多个原始bean定义创建的,通常被注册为{ @link GenericBeanDefinition . .。
+ * 在运行时,根bean定义本质上是“统一的bean定义视图”。
+ *
+ * <p>Root bean definitions may also be used for registering individual（个人的；个别的；独特的） bean definitions
+ * in the configuration phase（ 时期）. However, since Spring 2.5, the preferred（优先的；首选的） way to register
+ * bean definitions programmatically（以编程方式） is the {@link GenericBeanDefinition} class.
+ * GenericBeanDefinition has the advantage（优势） that it allows to dynamically define
  * parent dependencies, not 'hard-coding' the role as a root bean definition.
  *
+ * 根bean定义也可以用于在配置阶段注册单个bean定义。然而,自Spring 2.5以来,以编程方式注册bean定义的首选方法是{ @link GenericBeanDefinition }类。
+ * GenericBeanDefinition有一个优势,它允许动态地定义父依赖项,而不是“硬编码”作为根bean定义的角色。
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see GenericBeanDefinition

@@ -850,6 +850,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return if there are property values values defined for this bean.
+	 * 如果为该bean定义了属性值值,则返回返回。
 	 * @since 5.0.2
 	 */
 	@Override

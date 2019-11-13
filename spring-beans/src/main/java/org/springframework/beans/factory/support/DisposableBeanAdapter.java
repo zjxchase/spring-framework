@@ -92,6 +92,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 
 	/**
 	 * Create a new DisposableBeanAdapter for the given bean.
+	 * 为给定的bean创建一个新的setsablebeanadapter。
 	 * @param bean the bean instance (never {@code null})
 	 * @param beanName the name of the bean
 	 * @param beanDefinition the merged bean definition
@@ -104,28 +105,35 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		Assert.notNull(bean, "Disposable bean must not be null");
 		this.bean = bean;
 		this.beanName = beanName;
+		// 1.判断bean是否需要调用DisposableBean的destroy方法
 		this.invokeDisposableBean =
 				(this.bean instanceof DisposableBean && !beanDefinition.isExternallyManagedDestroyMethod("destroy"));
 		this.nonPublicAccessAllowed = beanDefinition.isNonPublicAccessAllowed();
 		this.acc = acc;
+		// 2.拿到自定义的destroy方法名
 		String destroyMethodName = inferDestroyMethodIfNecessary(bean, beanDefinition);
 		if (destroyMethodName != null && !(this.invokeDisposableBean && "destroy".equals(destroyMethodName)) &&
 				!beanDefinition.isExternallyManagedDestroyMethod(destroyMethodName)) {
 			this.destroyMethodName = destroyMethodName;
+			// 3.拿到自定义的destroy方法，赋值给this.destroyMethod
 			Method destroyMethod = determineDestroyMethod(destroyMethodName);
 			if (destroyMethod == null) {
 				if (beanDefinition.isEnforceDestroyMethod()) {
+					// 4.如果destroy方法名为空，并且enforceDestroyMethod为true，则抛出异常
 					throw new BeanDefinitionValidationException("Could not find a destroy method named '" +
 							destroyMethodName + "' on bean with name '" + beanName + "'");
 				}
 			}
 			else {
+				// 5.拿到destroy方法的参数类型数组
 				Class<?>[] paramTypes = destroyMethod.getParameterTypes();
 				if (paramTypes.length > 1) {
+					// 6.如果destroy方法的参数大于1个，则抛出异常
 					throw new BeanDefinitionValidationException("Method '" + destroyMethodName + "' of bean '" +
 							beanName + "' has more than one parameter - not supported as destroy method");
 				}
 				else if (paramTypes.length == 1 && boolean.class != paramTypes[0]) {
+					// 7.如果destroy方法的参数为1个，并且该参数的类型不为boolean，则抛出异常
 					throw new BeanDefinitionValidationException("Method '" + destroyMethodName + "' of bean '" +
 							beanName + "' has a non-boolean parameter - not supported as destroy method");
 				}
@@ -133,6 +141,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			}
 			this.destroyMethod = destroyMethod;
 		}
+		// 8.查找DestructionAwareBeanPostProcessors，并赋值给this.beanPostProcessors
 		this.beanPostProcessors = filterPostProcessors(postProcessors, bean);
 	}
 
@@ -172,29 +181,49 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 	/**
 	 * If the current value of the given beanDefinition's "destroyMethodName" property is
 	 * {@link AbstractBeanDefinition#INFER_METHOD}, then attempt to infer a destroy method.
+	 * 如果给定bean定义的“毁灭方法名称”属性的当前值是{ @link AbstractBeanDefinition # uri_method },然后尝试推断一个破坏方法。
+	 *
 	 * Candidate methods are currently limited to public, no-arg methods named "close" or
-	 * "shutdown" (whether declared locally or inherited). The given BeanDefinition's
+	 * "shutdown" (whether declared locally or inherited).
+	 * 候选方法目前仅限于公共、无arg方法,名为“close”或“关闭”(无论是在本地或继承)。
+	 *
+	 * The given BeanDefinition's
 	 * "destroyMethodName" is updated to be null if no such method is found, otherwise set
-	 * to the name of the inferred method. This constant serves as the default for the
+	 * to the name of the inferred method.
+	 * 如果没有找到这样的方法,给定的BeanDefinition的“rot ymethodname”将被更新为null,否则将设置为推断方法的名称。
+	 *
+	 * This constant serves as the default for the
 	 * {@code @Bean#destroyMethod} attribute and the value of the constant may also be
 	 * used in XML within the {@code <bean destroy-method="">} or {@code
 	 * <beans default-destroy-method="">} attributes.
+	 * 这个常量作为{ @code @Bean # destroy ymethod }属性的默认值,
+	 * 而且这个常量的值也可以在XML中使用{ @code < bean破坏者-方法= " > }或{ @code < bean default - destroy-method = " > }属性。
+	 *
 	 * <p>Also processes the {@link java.io.Closeable} and {@link java.lang.AutoCloseable}
 	 * interfaces, reflectively calling the "close" method on implementing beans as well.
+	 * 还可以处理{ @link java.io.Closeable}和{ @link java.lang.AutoCloseable}接口,又在反动化地调用了实现bean的“close”方法。
+	 *
+	 *
+	 *
 	 */
 	@Nullable
 	private String inferDestroyMethodIfNecessary(Object bean, RootBeanDefinition beanDefinition) {
+		// 1.拿到beanDefinition的destroy方法名
 		String destroyMethodName = beanDefinition.getDestroyMethodName();
+		// 2.如果destroy方法名为“(inferred)”|| destroyMethodName为null，并且bean是AutoCloseable实例
 		if (AbstractBeanDefinition.INFER_METHOD.equals(destroyMethodName) ||
 				(destroyMethodName == null && bean instanceof AutoCloseable)) {
 			// Only perform destroy method inference or Closeable detection
 			// in case of the bean not explicitly implementing DisposableBean
+			// 3.如果bean没有实现DisposableBean接口，则尝试推测destroy方法的名字
 			if (!(bean instanceof DisposableBean)) {
 				try {
+					// 4.尝试在bean中寻找方法名为close的方法作为destroy方法
 					return bean.getClass().getMethod(CLOSE_METHOD_NAME).getName();
 				}
 				catch (NoSuchMethodException ex) {
 					try {
+						// 5.尝试在bean中寻找方法名为close的方法作为shutdown方法
 						return bean.getClass().getMethod(SHUTDOWN_METHOD_NAME).getName();
 					}
 					catch (NoSuchMethodException ex2) {
@@ -202,6 +231,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 					}
 				}
 			}
+			// 6.如果没有找到，则返回null
 			return null;
 		}
 		return (StringUtils.hasLength(destroyMethodName) ? destroyMethodName : null);
@@ -209,6 +239,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 
 	/**
 	 * Search for all DestructionAwareBeanPostProcessors in the List.
+	 * 在列表中搜索所有的销毁后处理器。
 	 * @param processors the List to search
 	 * @return the filtered List of DestructionAwareBeanPostProcessors
 	 */
@@ -217,10 +248,14 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		List<DestructionAwareBeanPostProcessor> filteredPostProcessors = null;
 		if (!CollectionUtils.isEmpty(processors)) {
 			filteredPostProcessors = new ArrayList<>(processors.size());
+			// 1.遍历所有的BeanPostProcessor
 			for (BeanPostProcessor processor : processors) {
+				// 2.如果processor是DestructionAwareBeanPostProcessor
 				if (processor instanceof DestructionAwareBeanPostProcessor) {
 					DestructionAwareBeanPostProcessor dabpp = (DestructionAwareBeanPostProcessor) processor;
 					if (dabpp.requiresDestruction(bean)) {
+						// 3.如果给定的bean实例需要通过此后处理器进行销毁，
+						// 则添加到filteredPostProcessors
 						filteredPostProcessors.add(dabpp);
 					}
 				}
@@ -377,32 +412,42 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 
 	/**
 	 * Check whether the given bean has any kind of destroy method to call.
+	 * 检查给定的bean是否有任何破坏方法。
 	 * @param bean the bean instance
 	 * @param beanDefinition the corresponding bean definition
 	 */
 	public static boolean hasDestroyMethod(Object bean, RootBeanDefinition beanDefinition) {
 		if (bean instanceof DisposableBean || bean instanceof AutoCloseable) {
+			// 1.如果bean实现了DisposableBean接口 或者 bean是AutoCloseable实例，则返回true
 			return true;
 		}
+		// 2.拿到bean自定义的destroy方法名
 		String destroyMethodName = beanDefinition.getDestroyMethodName();
 		if (AbstractBeanDefinition.INFER_METHOD.equals(destroyMethodName)) {
+			// 3.如果自定义的destroy方法名为“(inferred)”（该名字代表需要我们自己去推测destroy的方法名），
+			// 则检查该bean是否存在方法名为“close”或“shutdown”的方法，如果存在，则返回true
 			return (ClassUtils.hasMethod(bean.getClass(), CLOSE_METHOD_NAME) ||
 					ClassUtils.hasMethod(bean.getClass(), SHUTDOWN_METHOD_NAME));
 		}
+		// 4.如果destroyMethodName不为空，则返回true
 		return StringUtils.hasLength(destroyMethodName);
 	}
 
 	/**
 	 * Check whether the given bean has destruction-aware post-processors applying to it.
+	 * 检查给定的bean是否有可破坏的后处理器应用于它。
 	 * @param bean the bean instance
 	 * @param postProcessors the post-processor candidates
 	 */
 	public static boolean hasApplicableProcessors(Object bean, List<BeanPostProcessor> postProcessors) {
 		if (!CollectionUtils.isEmpty(postProcessors)) {
+			// 1.遍历所有的BeanPostProcessor
 			for (BeanPostProcessor processor : postProcessors) {
+				// 2.如果processor是DestructionAwareBeanPostProcessor
 				if (processor instanceof DestructionAwareBeanPostProcessor) {
 					DestructionAwareBeanPostProcessor dabpp = (DestructionAwareBeanPostProcessor) processor;
 					if (dabpp.requiresDestruction(bean)) {
+						// 3.如果给定的bean实例需要通过此后处理器进行销毁，则返回true
 						return true;
 					}
 				}
