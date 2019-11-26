@@ -28,8 +28,8 @@ public class FactoryBeanConfigTest {
 	@Test
 	public void test() {
 
-		System.out.println(applicationContext.getBean("myFactoryBean"));
-		System.out.println(applicationContext.getBean("&myFactoryBean"));
+//		System.out.println(applicationContext.getBean("myFactoryBean"));
+//		System.out.println(applicationContext.getBean("&myFactoryBean"));
 
 	}
 }

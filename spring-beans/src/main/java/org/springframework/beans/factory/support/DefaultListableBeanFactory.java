@@ -1162,17 +1162,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return null;
 	}
 
-	/**
-	 * 解析指定依赖，这边的 DependencyDescriptor 主要是封装了依赖的方法和参数的信息
-	 *
-	 * @param descriptor the descriptor for the dependency (field/method/constructor)
-	 * @param requestingBeanName the name of the bean which declares the given dependency
-	 * @param autowiredBeanNames a Set that all names of autowired beans (used for
-	 * resolving the given dependency) are supposed to be added to
-	 * @param typeConverter the TypeConverter to use for populating arrays and collections
-	 * @return
-	 * @throws BeansException
-	 */
+	// 解析指定依赖，这边的 DependencyDescriptor 主要是封装了依赖的方法和参数的信息
 	@Override
 	@Nullable
 	public Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,
@@ -1205,15 +1195,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
-	/**
-	 * 解析依赖关系，返回的 result 为创建好的依赖对象的 bean 实例
-	 * @param descriptor
-	 * @param beanName
-	 * @param autowiredBeanNames
-	 * @param typeConverter
-	 * @return
-	 * @throws BeansException
-	 */
+	// 方法注释：解析依赖关系，返回的 result 为创建好的依赖对象的 bean 实例
 	@Nullable
 	public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {

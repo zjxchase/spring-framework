@@ -18,5 +18,6 @@ public class MyImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegi
 		// BeanDefinitionRegistry bean 定义注册器 bean 的id作为key 存在map中
 		registry.registerBeanDefinition("school", beanDefinition);
 
+		// 该技术 可以写中间件 如：mybatis-spring
 	}
 }
