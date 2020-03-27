@@ -153,7 +153,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
+		// 急于加载ContextClosedEvent类，以避免出现奇怪的类加载器问题
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		// WebLogic 8.1中应用程序关闭时发生的故障。
 		ContextClosedEvent.class.getName();
 	}
 
@@ -862,9 +864,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.
+	 * 完成此上下文的bean工厂的初始化，初始化所有剩余的单例bean。
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
+		// 判断是否有bdName为conversionService的bd(实现ConversionService接口)，有的话注册为格式转换器服务类
+		// 这里是结合spring MVC使用的，类似页面传递String类型的时间格式到后台可以格式化为Date类型 容器初始化完成后，默认是没有格式转换器的
+		// spring内部有个DefaultConversionService，但是没有注册进容器，所以spring找不到。
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -874,23 +880,34 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Register a default embedded value resolver if no bean post-processor
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
+		// 如果以前没有任何bean后处理器(例如PropertyPlaceholderConfigurer bean)注册，则注册一个默认的嵌入式值解析器:此时，主要用于解析注释属性值。
+		// 判断是否有LoadTimeWeaverAware类型的bd
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// 尽早初始化LoadTimeWeaverAware bean，以便尽早注册它们的转换器。
+		// 在Java 语言中，从织入切面的方式上来看，存在三种织入方式：编译期织入、类加载期织入和运行期织入。编译期织入是指在Java编译期，
+		// 采用特殊的编译器，将切面织入到Java类中；而类加载期织入则指通过特殊的类加载器，在类字节码加载到JVM时，织入切面；
+		// 运行期织入则是采用CGLib工具或JDK动态代理进行切面的织入。
+		// AspectJ提供了两种切面织入方式，第一种通过特殊编译器，在编译期，将AspectJ语言编写的切面类织入到Java类中，
+		// 可以通过一个Ant或Maven任务来完成这个操作；第二种方式是类加载期织入，也简称为LTW（Load Time Weaving）。
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
 		}
 
 		// Stop using the temporary ClassLoader for type matching.
+		// 停止使用临时类加载器进行类型匹配。
 		beanFactory.setTempClassLoader(null);
 
 		// Allow for caching all bean definition metadata, not expecting further changes.
+		// 冻结上下文，不允许再进行修改配置
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// 实例化所有剩余的(非惰性初始化)单例。
 		beanFactory.preInstantiateSingletons();
 	}
 

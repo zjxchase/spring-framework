@@ -23,13 +23,13 @@ public class StudentTest {
 
 	@Test
 	public void introduce() {
-//		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-//		applicationContext.register(Student.class);
-//		// 4、启动刷新容器
-//		applicationContext.refresh();
-//
-//		Student student = (Student) applicationContext.getBean("student");
-//		student.introduce();
+		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+		applicationContext.register(Student.class);
+		// 4、启动刷新容器
+		applicationContext.refresh();
+
+		Student student = (Student) applicationContext.getBean("student");
+		student.introduce();
 
 	}
 }

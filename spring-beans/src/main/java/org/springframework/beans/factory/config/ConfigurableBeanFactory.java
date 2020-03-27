@@ -99,10 +99,13 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	/**
 	 * Specify a temporary ClassLoader to use for type matching purposes.
 	 * Default is none, simply using the standard bean ClassLoader.
+	 * 指定用于类型匹配目的的临时类加载器。默认值是none，只需使用标准的bean类加载器即可。
 	 * <p>A temporary ClassLoader is usually just specified if
 	 * <i>load-time weaving</i> is involved, to make sure that actual bean
 	 * classes are loaded as lazily as possible. The temporary loader is
 	 * then removed once the BeanFactory completes its bootstrap phase.
+	 * 如果涉及到<i>加载时编织</i>，通常只指定一个临时类加载器，以确保实际的bean类被尽可能延迟地加载。
+	 * 一旦BeanFactory完成其引导阶段，就会删除临时加载程序。
 	 * @since 2.5
 	 */
 	void setTempClassLoader(@Nullable ClassLoader tempClassLoader);
@@ -219,6 +222,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	/**
 	 * Determine whether an embedded value resolver has been registered with this
 	 * bean factory, to be applied through {@link #resolveEmbeddedValue(String)}.
+	 * 确定是否已向此bean工厂注册了要通过其应用的嵌入式值解析器
 	 * @since 4.3
 	 */
 	boolean hasEmbeddedValueResolver();

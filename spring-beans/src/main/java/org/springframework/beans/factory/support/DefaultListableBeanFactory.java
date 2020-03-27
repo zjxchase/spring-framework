@@ -167,7 +167,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/** Map of singleton-only bean names, keyed by dependency type. */
 	private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
 
-	/** List of bean definition names, in registration order. */
+	/** List of bean definition names, in registration order. bean定义名称列表，按注册顺序排列。 */
 	private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
 
 	/** List of names of manually registered singletons, in registration order. */
@@ -829,13 +829,31 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
+		// 遍历一个副本以允许init方法，而init方法反过来注册新的bean定义。
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		// 虽然这可能不是常规的工厂引导的一部分，但它在其他方面也可以正常工作。
+		// this.beanDefinitionNames =
+		// [
+		//      org.springframework.context.annotation.internalConfigurationAnnotationProcessor,
+		//		org.springframework.context.annotation.internalAutowiredAnnotationProcessor,
+		//		org.springframework.context.annotation.internalCommonAnnotationProcessor,
+		//		org.springframework.context.event.internalEventListenerProcessor,
+		//		org.springframework.context.event.internalEventListenerFactory,
+		//		student
+        // ]
+		// 1.创建beanDefinitionNames的副本beanNames用于后续的遍历，以允许init等方法注册新的bean定义
+		// 通常 BeanDefinition 在之前加载到 BeanFactory 中的时候，通常是被封装成 GenericBeanDefinition 或 ScannedGenericBeanDefinition，
+		// 但是从这边之后 bean 的后续流程处理都是针对 RootBeanDefinition，因此在这边会统一将 BeanDefinition 转换成 RootBeanDefinition。
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
+		// 触发所有非惰性单例bean的初始化…
 		for (String beanName : beanNames) {
+			// 获取beanName对应的MergedBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// bd对应的Bean实例：不是抽象类 && 是单例 && 不是懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 判断beanName对应的bean是否为FactoryBean
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -856,6 +874,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
+					// 如果beanName对应的bean不是FactoryBean，只是普通Bean，通过beanName获取bean实例
 					getBean(beanName);
 				}
 			}

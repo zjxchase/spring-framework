@@ -53,7 +53,9 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 
 	/**
 	 * Name of the ConversionService bean in the factory.
+	 * 工厂中ConversionService bean的名称。
 	 * If none is supplied, default conversion rules apply.
+	 * 如果没有提供，则应用默认转换规则。
 	 * @since 3.0
 	 * @see org.springframework.core.convert.ConversionService
 	 */
